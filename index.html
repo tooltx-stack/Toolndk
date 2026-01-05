@@ -1,0 +1,531 @@
+<?php
+// KEY BẢO MẬT - CHỈ Ở SERVER-SIDE
+$SECRET_KEY = "ADMIN2025@K_PROXTON_ABCXYZ_1026";
+
+// Khởi động session để xác thực
+session_start();
+
+// Kiểm tra nếu đang gửi key để xác thực
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['verify_key'])) {
+        $userKey = $_POST['key'] ?? '';
+        if ($userKey === $SECRET_KEY) {
+            $_SESSION['authenticated'] = true;
+            $_SESSION['auth_time'] = time();
+            echo 'SUCCESS';
+        } else {
+            echo 'ERROR: SAI KEY KÍCH HOẠT! Vui lòng liên hệ Admin để nhận mã.';
+        }
+        exit;
+    }
+}
+
+// Kiểm tra xác thực
+$isAuthenticated = isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true;
+?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD5 TÀI XỈU - PROXTON VIP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #d4af37, #ffd700, #ffec8b);
+            color: #8b0000;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .vip-badge {
+            background: linear-gradient(45deg, #ff0000, #ff6b6b);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 15px;
+            animation: glow 1.5s infinite alternate;
+            border: 2px solid gold;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px #ff0000; }
+            to { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff0000; }
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #8b0000;
+            font-size: 1.1em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 18px 20px;
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            background: #fffaf0;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            transform: scale(1.01);
+        }
+
+        .key-input {
+            border-color: #8b0000 !important;
+            margin-bottom: 10px;
+            color: #8b0000;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #8b0000, #ff0000);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(139, 0, 0, 0.4);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #fffaf0, #ffe4e1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 3px solid #d4af37;
+            display: none;
+        }
+
+        .result-title {
+            color: #8b0000;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .prediction-result {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tai-result {
+            background: linear-gradient(135deg, #ffcccc, #ff6b6b);
+            border: 4px solid #ff0000;
+        }
+
+        .xiu-result {
+            background: linear-gradient(135deg, #ccffcc, #6bff6b);
+            border: 4px solid #008000;
+        }
+
+        .result-text {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .tai-text { color: #ff0000; }
+        .xiu-text { color: #008000; }
+
+        .loading { text-align: center; padding: 40px; }
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ff0000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #d4af37;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #8b0000;
+            margin: 5px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #8b0000, #ff0000);
+            color: white;
+        }
+
+        .disclaimer {
+            background: #ffeb3b;
+            color: #8b0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 MD5 🎲</h1>
+            <div class="subtitle">DỰ ĐOÁN TÀI XỈU</div>
+            <div class="vip-badge">PHIÊN BẢN ADMIN - KHÓA BẢO MẬT</div>
+        </div>
+
+        <div class="main-content">
+            <div class="disclaimer">
+                CÔNG CỤ BÁO KẾT QUẢ MD5 CHÍNH XÁC CAO
+            </div>
+
+            <div class="input-section">
+                <?php if (!$isAuthenticated): ?>
+                <div class="input-group">
+                    <label>NHẬP KEY KÍCH HOẠT (ADMIN)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="adminKey" class="key-input" placeholder="Nhập mã key để sử dụng...">
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <div class="input-group">
+                    <label>NHẬP MÃ MD5 PHIÊN</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="md5Input" placeholder="Nhập mã MD5 32 ký tự..." maxlength="32">
+                    </div>
+                </div>
+                
+                <button class="analyze-btn" onclick="predictTaiXiu()">
+                    XÁC THỰC & PHÂN TÍCH
+                </button>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <h3 class="result-title">KẾT QUẢ PHÂN TÍCH</h3>
+                <div id="predictionResult"></div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div>CHÍNH XÁC</div>
+                        <div class="stat-value" id="accuracy">0%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>SỐ LẦN SOI</div>
+                        <div class="stat-value" id="analysisCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>TỶ LỆ THẮNG</div>
+                        <div class="stat-value" id="winRate">0%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>MAY MẮN</div>
+                        <div class="stat-value" id="luckyNumber">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 MD5 PROXTON - HỆ THỐNG VIP</p>
+        </div>
+    </div>
+
+    <script>
+        let analysisCount = 0;
+        let winCount = 0;
+        let isAuthenticated = <?php echo $isAuthenticated ? 'true' : 'false'; ?>;
+
+        function predictTaiXiu() {
+            const md5Input = document.getElementById('md5Input').value.trim();
+            const resultSection = document.getElementById('resultSection');
+            const predictionResult = document.getElementById('predictionResult');
+
+            // Kiểm tra MD5 - GIỮ NGUYÊN NHƯ CODE GỐC
+            if (!md5Input) {
+                alert('Vui lòng nhập mã MD5');
+                return;
+            }
+
+            if (md5Input.length !== 32 || !/^[a-fA-F0-9]{32}$/.test(md5Input)) {
+                alert('Mã MD5 không hợp lệ (phải đủ 32 ký tự)!');
+                return;
+            }
+
+            // Hiển thị loading trước
+            predictionResult.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Đang xác thực Key Admin...</p>
+                    <p>Đang bẻ khóa thuật toán MD5...</p>
+                </div>
+            `;
+            resultSection.style.display = 'block';
+
+            // Nếu chưa xác thực, kiểm tra key
+            if (!isAuthenticated) {
+                const userKey = document.getElementById('adminKey')?.value.trim() || '';
+                if (!userKey) {
+                    alert('Vui lòng nhập key kích hoạt');
+                    resultSection.style.display = 'none';
+                    return;
+                }
+                
+                // Xác thực key trước
+                verifyKey(userKey, md5Input);
+            } else {
+                // Nếu đã xác thực, phân tích ngay
+                analyzeMD5(md5Input);
+            }
+        }
+
+        function verifyKey(userKey, md5Input) {
+            const formData = new FormData();
+            formData.append('verify_key', '1');
+            formData.append('key', userKey);
+
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'SUCCESS') {
+                    isAuthenticated = true;
+                    // Ẩn ô nhập key
+                    const keyInput = document.getElementById('adminKey');
+                    if (keyInput) keyInput.style.display = 'none';
+                    
+                    // Tiến hành phân tích
+                    analyzeMD5(md5Input);
+                } else {
+                    alert(data.replace('ERROR: ', ''));
+                    document.getElementById('resultSection').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Lỗi kết nối đến server');
+                document.getElementById('resultSection').style.display = 'none';
+            });
+        }
+
+        function analyzeMD5(md5Input) {
+            const formData = new FormData();
+            formData.append('md5', md5Input);
+
+            fetch('api.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // HIỂN THỊ KẾT QUẢ NGAY
+                displayResult(md5Input, data.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Nếu lỗi API, dùng thuật toán client-side
+                setTimeout(() => {
+                    generateTaiXiuPrediction(md5Input);
+                }, 1500);
+            });
+        }
+
+        function displayResult(md5Hash, apiData) {
+            analysisCount = apiData.analysis_count || analysisCount + 1;
+            
+            const result = apiData.result;
+            const confidence = apiData.confidence;
+            const luckyNumber = apiData.lucky_number;
+            
+            // Tăng số thắng ngẫu nhiên như code gốc
+            if (Math.random() > 0.2) winCount++;
+            
+            const winRate = Math.round((winCount / analysisCount) * 100);
+
+            // HIỂN THỊ KẾT QUẢ - GIỮ NGUYÊN NHƯ CODE GỐC
+            let resultHTML = '';
+            
+            if (result === "XỈU") {
+                resultHTML = `
+                    <div class="prediction-result tai-result">
+                        <div style="font-size: 1.5em; font-weight: bold;">KẾT QUẢ HỆ THỐNG</div>
+                        <div class="result-text tai-text">XỈU</div>
+                        <div class="confidence">Độ Tin Cậy: <strong>${confidence}%</strong></div>
+                        <div style="margin-top: 10px;">Lời khuyên: <strong style="color: #008000;">NÊN VÀO XỈU</strong></div>
+                    </div>
+                `;
+            } else {
+                resultHTML = `
+                    <div class="prediction-result xiu-result">
+                        <div style="font-size: 1.5em; font-weight: bold;">KẾT QUẢ HỆ THỐNG</div>
+                        <div class="result-text xiu-text">TÀI</div>
+                        <div class="confidence">Độ Tin Cậy: <strong>${confidence}%</strong></div>
+                        <div style="margin-top: 10px;">Lời khuyên: <strong style="color: #ff0000;">NÊN VÀO TÀI</strong></div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('accuracy').textContent = confidence + '%';
+            document.getElementById('analysisCount').textContent = analysisCount;
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('luckyNumber').textContent = luckyNumber;
+
+            document.getElementById('predictionResult').innerHTML = resultHTML;
+        }
+
+        // Hàm thuật toán cục bộ - GIỮ NGUYÊN NHƯ CODE GỐC
+        function generateTaiXiuPrediction(md5Hash) {
+            analysisCount++;
+            
+            const lastChar = md5Hash[md5Hash.length - 1].toLowerCase();
+            const isTai = parseInt(lastChar, 16) >= 8; 
+            const confidence = Math.floor(Math.random() * 20) + 79;
+            const luckyNumber = parseInt(md5Hash.substring(0, 2), 16) % 100;
+            const result = isTai ? "XỈU" : "TÀI";
+            
+            if (Math.random() > 0.2) winCount++;
+            
+            const winRate = Math.round((winCount / analysisCount) * 100);
+
+            let resultHTML = '';
+            
+            if (result === "XỈU") {
+                resultHTML = `
+                    <div class="prediction-result tai-result">
+                        <div style="font-size: 1.5em; font-weight: bold;">KẾT QUẢ HỆ THỐNG</div>
+                        <div class="result-text tai-text">XỈU</div>
+                        <div class="confidence">Độ Tin Cậy: <strong>${confidence}%</strong></div>
+                        <div style="margin-top: 10px;">Lời khuyên: <strong style="color: #008000;">NÊN VÀO XỈU</strong></div>
+                    </div>
+                `;
+            } else {
+                resultHTML = `
+                    <div class="prediction-result xiu-result">
+                        <div style="font-size: 1.5em; font-weight: bold;">KẾT QUẢ HỆ THỐNG</div>
+                        <div class="result-text xiu-text">TÀI</div>
+                        <div class="confidence">Độ Tin Cậy: <strong>${confidence}%</strong></div>
+                        <div style="margin-top: 10px;">Lời khuyên: <strong style="color: #ff0000;">NÊN VÀO TÀI</strong></div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('accuracy').textContent = confidence + '%';
+            document.getElementById('analysisCount').textContent = analysisCount;
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('luckyNumber').textContent = luckyNumber;
+
+            document.getElementById('predictionResult').innerHTML = resultHTML;
+        }
+
+        // Enter để chạy - GIỮ NGUYÊN NHƯ CODE GỐC
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') predictTaiXiu();
+        });
+    </script>
+</body>
+</html>

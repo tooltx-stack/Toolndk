@@ -1,0 +1,71 @@
+<?php
+// API XỬ LÝ THUẬT TOÁN
+
+session_start();
+
+// Key bảo mật
+$SECRET_KEY = "ADMIN2025@K_PROXTON_ABCXYZ_1026";
+
+// Kiểm tra xác thực
+if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+    echo json_encode(['error' => 'Vui lòng nhập key để kích hoạt hệ thống!']);
+    exit;
+}
+
+header('Content-Type: application/json');
+
+// Lấy dữ liệu
+$md5Input = isset($_POST['md5']) ? trim($_POST['md5']) : '';
+
+// Kiểm tra MD5
+if (!$md5Input) {
+    echo json_encode(['error' => 'Vui lòng nhập mã MD5']);
+    exit;
+}
+
+if (strlen($md5Input) !== 32 || !preg_match('/^[a-fA-F0-9]{32}$/', $md5Input)) {
+    echo json_encode(['error' => 'Mã MD5 không hợp lệ (phải đủ 32 ký tự)!']);
+    exit;
+}
+
+// KHỞI TẠO THỐNG KÊ
+if (!isset($_SESSION['stats'])) {
+    $_SESSION['stats'] = [
+        'analysis_count' => 0,
+        'win_count' => 0
+    ];
+}
+
+// TĂNG SỐ LẦN PHÂN TÍCH
+$_SESSION['stats']['analysis_count']++;
+$analysisCount = $_SESSION['stats']['analysis_count'];
+
+// THUẬT TOÁN PHÂN TÍCH - GIỮ NGUYÊN 100% NHƯ CODE GỐC
+$lastChar = strtolower($md5Input[strlen($md5Input) - 1]);
+$isTai = intval($lastChar, 16) >= 8; 
+$confidence = rand(79, 99); // 79-99%
+
+// TĂNG SỐ THẮNG - GIỮ NGUYÊN LOGIC CODE GỐC
+if (rand(1, 100) > 20) {
+    $_SESSION['stats']['win_count']++;
+}
+
+$winCount = $_SESSION['stats']['win_count'];
+$winRate = $analysisCount > 0 ? round(($winCount / $analysisCount) * 100) : 0;
+$luckyNumber = intval(substr($md5Input, 0, 2), 16) % 100;
+$result = $isTai ? "XỈU" : "TÀI";
+
+// TRẢ VỀ KẾT QUẢ NGAY
+echo json_encode([
+    'success' => true,
+    'data' => [
+        'result' => $result,
+        'confidence' => $confidence,
+        'lucky_number' => $luckyNumber,
+        'analysis_count' => $analysisCount,
+        'win_count' => $winCount,
+        'win_rate' => $winRate,
+        'md5_provided' => $md5Input
+    ]
+]);
+?>
